@@ -1,0 +1,29 @@
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background-color: blanchedalmond;
+  font-size: 20px;
+  font-weight: 900;
+  color: #333333cd;
+  border: 1px solid #333;
+  box-sizing: border-box;
+
+  text-shadow: -1px 1px 0px black, /* Bóng bên phải-dưới */ -1px 1px 0px black,
+    /* Bóng bên trái-dưới */ -1px 1px 0px black,
+    /* Bóng bên phải-trên */ -1px 1px 0px black; /* Bóng bên trái-trên */
+  &:hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
+}
+
+.active {
+  background-color: rgb(214, 198, 173);
+}
+
+.curStep {
+  color: #eb8933;
+}

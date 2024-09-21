@@ -1,0 +1,43 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: overlay;
+  font-family: TiktokFont;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+
+
+@font-face {
+  font-family: TiktokFont;
+  src: url('./assets/font/TikTokFont-Regular.woff2');
+  font-weight: 400;
+}
+@font-face {
+  font-family: TiktokFont;
+  src: url('./assets/font/TikTokFont-Semibold.woff2');
+  font-weight: 600;
+}
+@font-face {
+  font-family: TiktokFont;
+  src: url('./assets/font/TikTokFont-Bold.woff2');
+  font-weight: 700;
+}
+@font-face {
+  font-family: TikTokDisplayFont;
+  src: url('./assets/font/TikTokDisplayFont-Semibold.woff2');
+  font-weight: 600;
+}
+@font-face {
+  font-family: TikTokDisplayFont;
+  src: url('./assets/font/TikTokDisplayFont-Bold.woff2');
+  font-weight: 700;
+}

@@ -1,0 +1,35 @@
+.wrapper{
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.active{
+    color: #eb8933;
+}
+
+.right{
+    flex-direction: row-reverse;
+}
+
+.usename{
+    margin-right: 8px;
+}
+
+.img{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 42px;
+    width: 42px;
+    border-radius: 50%;
+    border: 1px solid #333;
+    margin: 0 12px;
+}
+
+.couter{
+    font-weight: 900;
+    font-size: 20px;
+    color: #33333388;
+
+}
