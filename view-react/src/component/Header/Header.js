@@ -1,7 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
 import UserTag from "../UserTag/UserTag";
-import Input from "../Input";
 
 const cx = classNames.bind(styles);
 

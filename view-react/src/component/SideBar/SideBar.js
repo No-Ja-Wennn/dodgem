@@ -1,8 +1,6 @@
 import classNames from "classnames/bind";
 import styles from "./SideBar.module.scss";
 import Input from "../Input";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretLeft } from "@fortawesome/free-solid-svg-icons";
 
 const cx = classNames.bind(styles);
 

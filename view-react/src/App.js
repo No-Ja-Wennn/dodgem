@@ -5,13 +5,11 @@ import { createContext, useEffect, useState } from "react";
 
 import ControlGame from "./component/ControlGame";
 import Header from "./component/Header";
-// import SideBar from "./component/SideBar";
 import Toast from "./component/Toast/Toast";
 
-const x = "X";
-const o = "O";
+const x = "x";
+const o = "o";
 const empty = "";
-
 
 export const currentUserContext = createContext();
 
@@ -35,13 +33,15 @@ function App() {
 
   useEffect(() => {
     if (!isError) {
-      setCurrentUser((prevUser) => (prevUser === 1 ? 2 : 1));
+      // setCurrentUser((prevUser) => (prevUser === 1 ? 2 : 1)); =>>> đừng xóa
       setCurrentActive({ rowIndex: null, colIndex: null });
     } else {
       addToast("warning", "Nước đi không đúng");
       setIsError(false);
     }
-  }, [values]); 
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values]);
 
   const addToast = (state, message) => {
     setToast({ message, state });
@@ -53,8 +53,8 @@ function App() {
 
   const handleActiveBox = (rowIndex, colIndex) => {
     const currentTic = currentUser === 1 ? x : o;
-    if(values[rowIndex][colIndex] === empty) return
-    else if(currentTic !== values[rowIndex][colIndex])
+    if (values[rowIndex][colIndex] === empty) return;
+    else if (currentTic !== values[rowIndex][colIndex])
       addToast("warning", "Đang tới lượt " + currentTic);
     else if (values[rowIndex][colIndex] !== empty)
       setCurrentActive({ rowIndex, colIndex });
@@ -127,6 +127,33 @@ function App() {
     return newValues;
   };
 
+  const postDataToServer = async (postValue) => {
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/send/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          value: postValue,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Something went wrong");
+      }
+
+      let data = await response.json();
+      data = data.best_move;
+      // setValues((prev) => handleSetValues(prev, position));
+      setValues(data);
+      setCurrentUser(1)
+      console.log("Success:", data);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
   const handleClickControl = (position) => {
     if (currentActive.rowIndex === null || currentActive.colIndex === null) {
       addToast("warning", "Vui lòng chọn quân cờ");
@@ -135,61 +162,65 @@ function App() {
     const rowIndex = currentActive.rowIndex;
     const colIndex = currentActive.colIndex;
 
-    if((currentUser === 1 ? x : o ) === values[rowIndex][colIndex]){
-      console.log("hop ly")
+    if ((currentUser === 1 ? x : o) === values[rowIndex][colIndex]) {
       setValues((prev) => handleSetValues(prev, position));
-    }else{
+      console.log(values);
+      // console.log(values)
+      setValues((prev) => handleSetValues(prev, position));
+
+      // Gửi dữ liệu lên server với dữ liệu tạm thời này
+      const updatedValues = handleSetValues(values, position); // Tính toán giá trị mới
+      console.log("updatedValues: ", updatedValues)
+      postDataToServer(updatedValues);
+    } else {
       addToast("warning", "Chọn sai quân");
     }
-
-
   };
 
   return (
     <div className="App">
       <currentUserContext.Provider value={{ currentUser }}>
-        
-      <Header />
-      <div className="container">
-        <div className="toast">
-          {Object.keys(toast).length > 0 && (
-            <Toast
-              stateValue={toast.state}
-              value={toast.message}
-              onClose={() => removeToast()}
-            />
-          )}
-        </div>
-        <Wrapp>
-          {values.map((row, rowIndex) =>
-            row.map((col, colIndex) => (
-              <Box
-                active={
-                  currentActive.rowIndex === rowIndex &&
-                  currentActive.colIndex === colIndex
-                    ? "active"
-                    : ""
-                }
-                value={col}
-                curStep = {(currentUser === 1 ? x : o) === col}
-                key={`${rowIndex}-${colIndex}`}
-                onClick={() => handleActiveBox(rowIndex, colIndex)}
+        <Header />
+        <div className="container">
+          <div className="toast">
+            {Object.keys(toast).length > 0 && (
+              <Toast
+                stateValue={toast.state}
+                value={toast.message}
+                onClose={() => removeToast()}
               />
-            ))
-          )}
-        </Wrapp>
-        <ControlGame
-          currentUser={currentUser}
-          // active={currentUser === 1}
-          position={currentUser === 1 ? "left" : "bottom"}
-          handleClick={handleClickControl}
-        />
-        {/* <ControlGame
+            )}
+          </div>
+          <Wrapp>
+            {values.map((row, rowIndex) =>
+              row.map((col, colIndex) => (
+                <Box
+                  active={
+                    currentActive.rowIndex === rowIndex &&
+                    currentActive.colIndex === colIndex
+                      ? "active"
+                      : ""
+                  }
+                  value={col}
+                  curStep={(currentUser === 1 ? x : o) === col}
+                  key={`${rowIndex}-${colIndex}`}
+                  onClick={() => handleActiveBox(rowIndex, colIndex)}
+                />
+              ))
+            )}
+          </Wrapp>
+          <ControlGame
+            currentUser={currentUser}
+            // active={currentUser === 1}
+            position={currentUser === 1 ? "left" : "bottom"}
+            handleClick={handleClickControl}
+          />
+          {/* <ControlGame
           active={currentUser === 2}
           position="bottom"
           handleClick={handleClickControl}
         /> */}
-      </div>
+        </div>
       </currentUserContext.Provider>
     </div>
   );
