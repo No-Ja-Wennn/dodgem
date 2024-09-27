@@ -28,7 +28,7 @@ function App() {
   const [isError, setIsError] = useState(false);
 
   useEffect(() => {
-    document.title = "Dodgen"; // Đặt tiêu đề
+    document.title = "Dodgen"; 
   }, []);
 
   useEffect(() => {
