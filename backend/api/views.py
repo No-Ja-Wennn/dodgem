@@ -20,6 +20,7 @@ o_state = [
     [0, 5, 10]
 ]
 
+
 # Giới hạn độ sâu đệ quy
 MAX_DEPTH = 10
 
@@ -35,23 +36,23 @@ def isWin(u):
                 have_o = True
     return not have_x or not have_o
 
-
-def printArray(array):
-    for row in array:
-        print(row)
-def printArray2(array):
-    for row in array:
+def count_have_o(u):
+    count = 0
+    for row in u:
         for col in row:
-            print(col)
-    print('========================')
-    print()
+            if col == o:
+                count += 1
+    if count == 2:
+        return 0
+    if count == 1:
+        return 20
+    if count == 0:
+        return 50
+    return 0
     
 # Tính tổng điểm của trạng thái bàn cờ
 def count_state(u):
     sum = 0
-    # print("count state of: ")
-    # printArray(u)
-    # print("================================")
     for row in range(len(u)):
         for col in range(len(u)):
             value_point = u[row][col]
@@ -60,47 +61,59 @@ def count_state(u):
                     sum += x_state[row][col]
                 else:
                     sum += o_state[row][col]
+        
     return sum
 
 def right(data, row, col):
     if col >= len(data) - 1:
         if data[row][col] == x:
             data[row][col] = empty
-            return data  
+            return {"u": data, "score": count_state(data) - 1000}
         else:
-            return None
+            return {"u": None, "score": 0}
+        
     if data[row][col + 1] != empty:
-        return None
+        return {"u": None, "score": 0}
+    
     if data[row][col + 1] == empty:
         data[row][col + 1] = data[row][col]
         data[row][col] = empty
-        return data
+        return {"u": data, "score": count_state(data)}
+
 
 def left(data, row, col):
     if data[row][col] == x or col <= 0 or data[row][col - 1] != empty:
-        return None
+        return {"u": None, "score": 0}
+
     if data[row][col - 1] == empty:
         data[row][col - 1] = data[row][col]
         data[row][col] = empty
-    return data
+    return {"u": data, "score": count_state(data)}
+
 
 def bottom(data, row, col):
     if  data[row][col] == o or row >= len(data) - 1 or data[row + 1][col] != empty:
-        return None
+        return {"u": None, "score": 0}
+
     if data[row + 1][col] == empty:
         data[row + 1][col] = data[row][col]
         data[row][col] = empty
-    return data
+    return {"u": data, "score": count_state(data)}
+
 
 def top(data, row, col):
     if row == 0 and data[row][col] == o:
         data[row][col] = empty
+        return {"u": data, "score": 1000 + count_state(data)}
+
     elif row <= 0 or data[row - 1][col] != empty:
-        return None
+        return {"u": None, "score": 0}
+
     elif data[row - 1][col] == empty:
         data[row - 1][col] = data[row][col]
         data[row][col] = empty
-    return data
+    return {"u": data, "score": count_state(data)}
+
 
 
 # Tìm tất cả các trạng thái con
@@ -108,19 +121,19 @@ def caseOfPoint(u, row, col):
     arr = []
     u_copy = copy.deepcopy(u)
     tempArray = right(u_copy, row, col)
-    if tempArray is not None:
+    if tempArray["u"] is not None:
         arr.append(tempArray)
     u_copy = copy.deepcopy(u)
     tempArray = left(u_copy, row, col)
-    if tempArray is not None:
+    if tempArray["u"] is not None:
         arr.append(tempArray)
     u_copy = copy.deepcopy(u)
     tempArray = bottom(u_copy, row, col)
-    if tempArray is not None:
+    if tempArray["u"] is not None:
         arr.append(tempArray)
     u_copy = copy.deepcopy(u)
     tempArray = top(u_copy, row, col)
-    if tempArray is not None:
+    if tempArray["u"] is not None:
         arr.append(tempArray)
     return arr
 
@@ -136,26 +149,20 @@ def all_case_of_type(u, key):
 # Alpha-beta pruning implementation with depth limit
 count = 0
 def MaxVal(u, alpha, beta, depth):
-    if isWin(u) or depth == 0:
-        if isWin(u):
-            print("winx: ", u, count_state(u))
-            print("========================")
-        return count_state(u)
-    for v in all_case_of_type(u, x):
+    if isWin(u["u"]) or depth == 0:
+        return u["score"]
+    
+    for v in all_case_of_type(u["u"], x):
         alpha = max(alpha, MinVal(v, alpha, beta, depth - 1))
         if alpha >= beta:
             break
     return alpha
 
 def MinVal(u, alpha, beta, depth):
+    if isWin(u["u"]) or depth == 0:
+        return u["score"]
     
-    if isWin(u) or depth == 0:
-        if isWin(u):
-            print("wino: ", u, count_state(u))
-            print("========================")
-        return count_state(u)
-    
-    for v in all_case_of_type(u, o):
+    for v in all_case_of_type(u["u"], o):
         beta = min(beta, MaxVal(v, alpha, beta, depth - 1))
         if alpha >= beta:
             break
@@ -165,21 +172,13 @@ def Alpha_beta(u):
     alpha = float('-inf')
     beta = float('inf')
     best_move = None
-    # best_move = []
-    
-    # print("u: ", u)
-    # print('all case:')
-    # printArray2(all_case_of_type(u, o))
-    # print('-========================================')
     
     for w in all_case_of_type(u, o):
         value = MinVal(w, alpha, beta, MAX_DEPTH)
         if alpha <= value:
             alpha = value
             best_move = w
-            # best_move.append(w)
 
-    
     return best_move
 
 # View xử lý request và trả về kết quả
@@ -190,14 +189,9 @@ def index(request):
         
         if not data:
             return JsonResponse({"error": "Invalid data"}, status=400)
-        print(data)
 
         result = Alpha_beta(data)
-        # result = all_case_of_type(data, o)
-
-        print("result: ")
-        printArray(result)
-        return JsonResponse({"best_move": result})
+        return JsonResponse({"best_move": result["u"]})
     
     return JsonResponse({"message": "Send a POST request with the game board data."})
 

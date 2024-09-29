@@ -36,7 +36,7 @@ function App() {
       // setCurrentUser((prevUser) => (prevUser === 1 ? 2 : 1)); =>>> đừng xóa
       setCurrentActive({ rowIndex: null, colIndex: null });
     } else {
-      addToast("warning", "Nước đi không đúng");
+      // addToast("warning", "Nước đi không đúng");
       setIsError(false);
     }
 
